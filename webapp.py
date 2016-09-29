@@ -15,10 +15,17 @@ KODI_URL = 'http://localhost:7777/jsonrpc'
 KODI_JSON = '{"jsonrpc": "2.0", "method": "Addons.ExecuteAddon","params": { "addonid": "script.clipplay", "params" : ["%s","%s"]}}'
 KODI_MUTE = '{"jsonrpc": "2.0", "method": "Application.SetMute","params": { "mute":"toggle"}}'
 KODI_IS_MUTE = '{"jsonrpc": "2.0", "method": "Application.GetProperties", "params": {"properties": ["muted"]}, "id": 1}'
+KODI_PING = '{"jsonrpc": "2.0", "method": "JSONRPC.Ping", "id":1}'
 PAGE = None
+
 BUTTON_LINE = '<button type="submit" action="/start_clip" name="clip" value="%s"/>%s</button> ---- <i>%s</i><br>'
 @app.route('/')
 def start_page():
+	try:
+		if s != send_cmd(KODI_PING).json()['result']
+			raise Exception('Kodi not responding')
+	except Exception as err:
+		return(render_template('kodi_error.html'))
 	global PAGE
 	if PAGE is None:
 		PAGE = build_page()
@@ -51,7 +58,7 @@ def play_audio(audio_path,audio_len):
 	time.sleep(vid_len//1000)
 	set_mute_kodi(False)
 def set_mute_kodi(target):
-	if json.loads(send_cmd(KODI_IS_MUTE).content.decode('utf8'))['result']['muted'] != target:
+	if send_cmd(KODI_IS_MUTE).json()['result']['muted'] != target:
 		send_cmd(KODI_MUTE)
 
 
