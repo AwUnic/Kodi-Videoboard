@@ -4,6 +4,7 @@ from flask import render_template
 from flask import request, redirect, url_for
 import requests
 import json
+import time
 
 app = Flask(__name__)
 
@@ -18,7 +19,6 @@ PAGE = None
 BUTTON_LINE = '<button type="submit" action="/start_clip" name="clip" value="%s"/>%s</button> ---- <i>%s</i><br>'
 @app.route('/')
 def start_page():
-	set_mute_kodi(False)
 	global PAGE
 	if PAGE is None:
 		PAGE = build_page()
@@ -45,8 +45,11 @@ def dank_confirm():
 
 def play_video(vid_path,vid_len):
 	send_cmd(KODI_JSON % (vid_path,vid_len))
-#def play_audio(audio_path,audio_len):
-	#TODO add mopidy support
+def play_audio(audio_path,audio_len):
+	set_mute_kodi(True)
+	#TODO add mopidy support or some other audio playback
+	time.sleep(vid_len//1000)
+	set_mute_kodi(False)
 def set_mute_kodi(target):
 	if json.loads(send_cmd(KODI_IS_MUTE).content.decode('utf8'))['result']['muted'] != target:
 		send_cmd(KODI_MUTE)
@@ -68,7 +71,7 @@ def build_page():
 		cur = con.cursor()
 		cur.execute(DB_GET_CLIPS)
 		clips += cur.fetchall()
-	page = '<h1>Choose the dankest of memes!</h1><FORM action="/start_clip"><P>'
+	page = ['<h1>Choose the dankest of memes!</h1><FORM action="/start_clip"><P>']
 	for clip in clips:
-		page += BUTTON_LINE % (clip)
-	return page+"</P></FORM>"
+		page.append(BUTTON_LINE % (clip))
+	return ''.join(page+["</P></FORM>"])
