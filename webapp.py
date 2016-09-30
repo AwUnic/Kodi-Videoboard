@@ -22,7 +22,7 @@ BUTTON_LINE = '<button type="submit" action="/start_clip" name="clip" value="%s"
 @app.route('/')
 def start_page():
 	try:
-		if s != send_cmd(KODI_PING).json()['result']
+		if send_cmd(KODI_PING).json()['result'] != 'pong':
 			raise Exception('Kodi not responding')
 	except Exception as err:
 		return(render_template('kodi_error.html'))
