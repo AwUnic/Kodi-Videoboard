@@ -1,0 +1,9 @@
+CREATE TABLE clips(
+title string, 
+name string UNIQUE,
+category string,
+path string,
+description string,
+length integer ,
+id INTEGER PRIMARY KEY,
+type string);
